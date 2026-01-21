@@ -15,7 +15,6 @@ Reference paper: Zhu et al., 2007, *“Markov blanket-embedded genetic algorithm
 
 ## Methodology 
 
-<br>
 
 ### 1) Data loading and label handling
 
