@@ -5,8 +5,12 @@ Oguzhan Memis             22/01/2026
 
 
 Dataset link: https://csse.szu.edu.cn/staff/zhuzx/Datasets.html
-
 Original paper: "Markov blanket-embedded genetic algorithm for gene selection" from Zhu et. al. 2007
+
+
+This code includes processing & analyses of 2 different datasets, that named as SRBCT and Colon Tumor.
+
+RUN THE CODES CELL BY CELL, JUST LIKE A JUPYTER NOTEBOOK
 """
 
 
@@ -1576,9 +1580,442 @@ plt.show()
 
 #%% 7) Analysis of the results
 
-#1 model results bar graph
 
-#2 correlation matirx of selected features for 3 methods
+
+
+
+# 1) Bar graphs for comparison of model results
+# ============================================================================
+
+
+
+# SRBCT Results
+srbct_results = {
+    'Model': ['RF', 'SVM', 'LDA', 'XGBoost', 'MLP'],
+    
+    # Mutual Information
+    'MI_CV': [100.0, 100.0, 100.0, 95.60, 100.0],
+    'MI_Test': [100.0, 100.0, 100.0, 100.0, 100.0],
+    
+    # RFE
+    'RFE_CV': [100.0, 100.0, 100.0, 95.60, 98.57],
+    'RFE_Test': [100.0, 100.0, 100.0, 100.0, 100.0],
+    
+    # LASSO
+    'LASSO_CV': [96.92, 98.46, 96.92, 93.85, 95.38],
+    'LASSO_Test': [100.0, 94.12, 88.24, 94.12, 94.12]
+}
+
+
+
+# Colon Results
+colon_results = {
+    'Model': ['RF', 'SVM', 'LDA', 'XGBoost', 'MLP'],
+    
+    # Mutual Information
+    'MI_CV': [92.0, 94.0, 92.0, 89.56, 89.78],
+    'MI_Test': [76.92, 76.92, 84.62, 76.92, 84.62],
+    
+    # RFE
+    'RFE_CV': [86.0, 92.0, 92.0, 83.78, 94.0],
+    'RFE_Test': [76.92, 76.92, 84.62, 84.62, 76.92],
+    
+    # LASSO
+    'LASSO_CV': [83.56, 91.78, 87.56, 87.78, 91.78],
+    'LASSO_Test': [76.92, 69.23, 84.62, 69.23, 76.92]
+}
+
+
+df_srbct = pd.DataFrame(srbct_results)
+df_colon = pd.DataFrame(colon_results)
+
+
+
+# 1.2) SRBCT results
+
+models = df_srbct['Model'].values
+n_models = len(models)
+
+# Set up the figure with 2 subplots (CV and Test)
+fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+
+bar_width = 0.25
+x_pos = np.arange(n_models)
+
+colors_mi = '#2ecc71'      # Green
+colors_rfe = '#3498db'     # Blue
+colors_lasso = '#e74c3c'   # Red
+
+
+
+# SUBPLOT 1: Cross-Validation Accuracy 
+ax1 = axes[0]
+
+bars1_mi = ax1.bar(x_pos - bar_width, df_srbct['MI_CV'], bar_width, 
+                   label='Mutual Information', color=colors_mi, alpha=0.8)
+bars1_rfe = ax1.bar(x_pos, df_srbct['RFE_CV'], bar_width, 
+                    label='RFE', color=colors_rfe, alpha=0.8)
+bars1_lasso = ax1.bar(x_pos + bar_width, df_srbct['LASSO_CV'], bar_width, 
+                      label='LASSO', color=colors_lasso, alpha=0.8)
+
+# Add value labels on bars
+for bars in [bars1_mi, bars1_rfe, bars1_lasso]:
+    for bar in bars:
+        height = bar.get_height()
+        ax1.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.1f}%',
+                ha='center', va='bottom', fontsize=9, rotation=0)
+
+ax1.set_xlabel('Models', fontsize=12, fontweight='bold')
+ax1.set_ylabel('Cross-Validation Accuracy (%)', fontsize=12, fontweight='bold')
+ax1.set_title('Cross-Validation Accuracy - SRBCT Dataset', 
+              fontsize=14, fontweight='bold', pad=20)
+ax1.set_xticks(x_pos)
+ax1.set_xticklabels(models, fontsize=11)
+ax1.legend(loc='lower right', fontsize=10)
+ax1.grid(axis='y', alpha=0.3, linestyle='--')
+ax1.set_ylim([0, 105])
+
+
+# SUBPLOT 2: Test Accuracy 
+ax2 = axes[1]
+
+bars2_mi = ax2.bar(x_pos - bar_width, df_srbct['MI_Test'], bar_width, 
+                   label='Mutual Information', color=colors_mi, alpha=0.8)
+bars2_rfe = ax2.bar(x_pos, df_srbct['RFE_Test'], bar_width, 
+                    label='RFE', color=colors_rfe, alpha=0.8)
+bars2_lasso = ax2.bar(x_pos + bar_width, df_srbct['LASSO_Test'], bar_width, 
+                      label='LASSO', color=colors_lasso, alpha=0.8)
+
+# Add value labels on bars
+for bars in [bars2_mi, bars2_rfe, bars2_lasso]:
+    for bar in bars:
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.1f}%',
+                ha='center', va='bottom', fontsize=9, rotation=0)
+
+ax2.set_xlabel('Models', fontsize=12, fontweight='bold')
+ax2.set_ylabel('Test Accuracy (%)', fontsize=12, fontweight='bold')
+ax2.set_title('Test Accuracy - SRBCT Dataset', 
+              fontsize=14, fontweight='bold', pad=20)
+ax2.set_xticks(x_pos)
+ax2.set_xticklabels(models, fontsize=11)
+ax2.legend(loc='lower right', fontsize=10)
+ax2.grid(axis='y', alpha=0.3, linestyle='--')
+ax2.set_ylim([0, 105])
+
+plt.tight_layout()
+plt.show()
+
+
+
+# 1.3) Colon Results
+
+
+models = df_colon['Model'].values
+n_models = len(models)
+
+# Set up the figure with 2 subplots (CV and Test)
+fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+
+
+bar_width = 0.25
+x_pos = np.arange(n_models)
+
+
+
+# SUBPLOT 1: Cross-Validation Accuracy 
+ax1 = axes[0]
+
+bars1_mi = ax1.bar(x_pos - bar_width, df_colon['MI_CV'], bar_width, 
+                   label='Mutual Information', color=colors_mi, alpha=0.8)
+bars1_rfe = ax1.bar(x_pos, df_colon['RFE_CV'], bar_width, 
+                    label='RFE', color=colors_rfe, alpha=0.8)
+bars1_lasso = ax1.bar(x_pos + bar_width, df_colon['LASSO_CV'], bar_width, 
+                      label='LASSO', color=colors_lasso, alpha=0.8)
+
+
+# Add value labels on bars
+for bars in [bars1_mi, bars1_rfe, bars1_lasso]:
+    for bar in bars:
+        height = bar.get_height()
+        ax1.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.1f}%',
+                ha='center', va='bottom', fontsize=9, rotation=0)
+
+ax1.set_xlabel('Models', fontsize=12, fontweight='bold')
+ax1.set_ylabel('Cross-Validation Accuracy (%)', fontsize=12, fontweight='bold')
+ax1.set_title('Cross-Validation Accuracy - Colon Dataset', 
+              fontsize=14, fontweight='bold', pad=20)
+ax1.set_xticks(x_pos)
+ax1.set_xticklabels(models, fontsize=11)
+ax1.legend(loc='lower right', fontsize=10)
+ax1.grid(axis='y', alpha=0.3, linestyle='--')
+ax1.set_ylim([0, 105])
+
+
+
+
+# SUBPLOT 2: Test Accuracy 
+ax2 = axes[1]
+
+bars2_mi = ax2.bar(x_pos - bar_width, df_colon['MI_Test'], bar_width, 
+                   label='Mutual Information', color=colors_mi, alpha=0.8)
+bars2_rfe = ax2.bar(x_pos, df_colon['RFE_Test'], bar_width, 
+                    label='RFE', color=colors_rfe, alpha=0.8)
+bars2_lasso = ax2.bar(x_pos + bar_width, df_colon['LASSO_Test'], bar_width, 
+                      label='LASSO', color=colors_lasso, alpha=0.8)
+
+
+# Add value labels on bars
+for bars in [bars2_mi, bars2_rfe, bars2_lasso]:
+    for bar in bars:
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.1f}%',
+                ha='center', va='bottom', fontsize=9, rotation=0)
+
+ax2.set_xlabel('Models', fontsize=12, fontweight='bold')
+ax2.set_ylabel('Test Accuracy (%)', fontsize=12, fontweight='bold')
+ax2.set_title('Test Accuracy - Colon Dataset', 
+              fontsize=14, fontweight='bold', pad=20)
+ax2.set_xticks(x_pos)
+ax2.set_xticklabels(models, fontsize=11)
+ax2.legend(loc='lower right', fontsize=10)
+ax2.grid(axis='y', alpha=0.3, linestyle='--')
+ax2.set_ylim([0, 105])
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+# 2) Advanced Visualizations for Selected 50 Genes (can change by F.Selection algorithm)
+
+
+
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+
+# Set styles for plots
+sns.set_style("whitegrid")
+plt.rcParams['font.size'] = 10
+plt.rcParams['axes.labelsize'] = 12
+plt.rcParams['axes.titlesize'] = 14
+plt.rcParams['xtick.labelsize'] = 10
+plt.rcParams['ytick.labelsize'] = 10
+
+
+
+# 2.1 CLUSTERED HEATMAP 
+# ============================================================================
+# Reveals which genes cluster together and which samples are similar
+
+
+# For SRBCT ----------------
+
+plt.figure(figsize=(20, 20))
+
+
+# Define the colors for class labels
+class_colors_srbct = y_train_srbct.map({0: '#e74c3c', 1: '#3498db', 2: '#2ecc71', 3: '#f39c12'})
+
+
+# Clustered heatmap with Z-score normalization
+
+g1 = sns.clustermap(X_train_srbct_selected.T,    # only training set is used
+                    cmap='RdBu_r', 
+                    z_score=0,  
+                    col_colors=class_colors_srbct,
+                    figsize=(16, 12),
+                    cbar_kws={'label': 'Z-score'},
+                    dendrogram_ratio=0.15,
+                    yticklabels=True,
+                    xticklabels=False)
+g1.fig.suptitle('Clustered Heatmap of 50 Selected Genes (SRBCT)', y=0.98, fontsize=16, fontweight='bold')
+plt.show()
+
+
+
+
+# For Colon ----------------
+
+plt.figure(figsize=(20, 20))
+
+
+
+class_colors_colon = y_train_colon.map({0: '#3498db', 1: '#e74c3c'})  # Normal=Blue, Tumor=Red
+
+g2 = sns.clustermap(X_train_colon_selected.T, 
+                    cmap='RdBu_r', 
+                    z_score=0,
+                    col_colors=class_colors_colon,
+                    figsize=(16, 12),
+                    cbar_kws={'label': 'Z-score'},
+                    dendrogram_ratio=0.15,
+                    yticklabels=True,
+                    xticklabels=False)
+g2.fig.suptitle('Clustered Heatmap of 50 Selected Genes (Colon)', y=0.98, fontsize=16, fontweight='bold')
+plt.show()
+
+
+
+# 2.2 Violin Plot for best 20 genes
+# ============================================================================
+# Shows distribution of the most important genes
+
+
+
+# For SRBCT ---------------
+top_20_genes_srbct = X_train_srbct_selected.columns[:20]
+
+fig, axes = plt.subplots(4, 5, figsize=(24, 18))
+axes = axes.flatten()
+
+for idx, gene in enumerate(top_20_genes_srbct):
+    # Combine train and test
+    gene_data_srbct = pd.DataFrame({
+        'Expression': X_train_srbct_selected[gene],
+        'Class': y_train_srbct
+    })
+    
+    sns.violinplot(data=gene_data_srbct, x='Class', y='Expression', 
+                   palette=['#e74c3c', '#3498db', '#2ecc71', '#f39c12'],
+                   ax=axes[idx])
+    axes[idx].set_title(f'{gene}', fontweight='bold')
+    axes[idx].set_xlabel('Cancer Type')
+    axes[idx].set_ylabel('Expression Level')
+
+plt.suptitle('Top 20 Genes Expression Distribution (SRBCT)', fontsize=16, fontweight='bold', y=1.00)
+plt.tight_layout()
+plt.show()
+
+
+
+# For Colon --------------
+top_20_genes_colon = X_train_colon_selected.columns[:20]
+
+fig, axes = plt.subplots(4, 5, figsize=(24, 18))
+axes = axes.flatten()
+
+for idx, gene in enumerate(top_20_genes_colon):
+    gene_data_colon = pd.DataFrame({
+        'Expression': X_train_colon_selected[gene],
+        'Class': y_train_colon
+    })
+    
+    sns.violinplot(data=gene_data_colon, x='Class', y='Expression', 
+                   palette=['#3498db', '#e74c3c'],
+                   ax=axes[idx])
+    axes[idx].set_title(f'{gene}', fontweight='bold')
+    axes[idx].set_xlabel('Class')
+    axes[idx].set_ylabel('Expression Level')
+    axes[idx].set_xticklabels(['Normal', 'Tumor'])
+
+
+plt.suptitle('Top 20 Genes Expression Distribution (Colon)', fontsize=16, fontweight='bold', y=1.00)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+# 2.3 Correlation Heatmap
+# ============================================================================
+# Shows gene-gene correlations 
+
+
+# For SRBCT ---------------------------
+correlation_matrix_srbct = X_train_srbct_selected[top_20_genes_srbct].corr()
+
+plt.figure(figsize=(14, 12))
+
+sns.heatmap(correlation_matrix_srbct, cmap='Purples', center=0,
+            square=True, linewidths=0.5, cbar_kws={"shrink": 0.8},
+            vmin=-1, vmax=1)
+plt.title('Gene-Gene Correlation Matrix (SRBCT)', fontsize=14, fontweight='bold', pad=20)
+plt.tight_layout()
+plt.show()
+
+
+
+# For Colon ---------------------------
+correlation_matrix_colon = X_train_colon_selected[top_20_genes_colon].corr()
+
+plt.figure(figsize=(14, 12))
+
+sns.heatmap(correlation_matrix_colon, cmap='Purples', center=0,
+            square=True, linewidths=0.5, cbar_kws={"shrink": 0.8},
+            vmin=-1, vmax=1)
+plt.title('Gene-Gene Correlation Matrix (Colon)', fontsize=14, fontweight='bold', pad=20)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+# 2.4: Box Plots for the best 20 genes
+# ============================================================================
+# Shows outliers and summary
+
+
+
+# For SRBCT -----------------------
+
+
+fig, axes = plt.subplots(4, 5, figsize=(24, 18))
+axes = axes.flatten()
+
+for idx, gene in enumerate(top_20_genes_srbct):
+    gene_data_srbct = pd.DataFrame({
+        'Expression': X_train_srbct_selected[gene],
+        'Class': y_train_srbct
+    })
+    
+    sns.boxplot(data=gene_data_srbct, x='Class', y='Expression', 
+                palette=['#e74c3c', '#3498db', '#2ecc71', '#f39c12'],
+                ax=axes[idx], showfliers=True)
+    axes[idx].set_title(f'{gene}', fontweight='bold', fontsize=12)
+    axes[idx].set_xlabel('Cancer Type', fontweight='bold')
+    axes[idx].set_ylabel('Expression Level' if idx == 0 else '', fontweight='bold')
+
+plt.suptitle('Top 20 Biomarker Genes (SRBCT)', fontsize=14, fontweight='bold', y=1.00)
+plt.tight_layout()
+plt.show()
+
+
+
+# For Colon -------------------------
+
+
+fig, axes = plt.subplots(4, 5, figsize=(24, 18))
+axes = axes.flatten()
+
+for idx, gene in enumerate(top_20_genes_colon):
+    gene_data_colon = pd.DataFrame({
+        'Expression': X_train_colon_selected[gene],
+        'Class': y_train_colon
+    })
+    
+    sns.boxplot(data=gene_data_colon, x='Class', y='Expression', 
+                palette=['#3498db', '#e74c3c'],
+                ax=axes[idx], showfliers=True)
+    axes[idx].set_title(f'{gene}', fontweight='bold', fontsize=12)
+    axes[idx].set_xlabel('Class', fontweight='bold')
+    axes[idx].set_xticklabels(['Normal', 'Tumor'])
+    axes[idx].set_ylabel('Expression Level' if idx == 0 else '', fontweight='bold')
+
+plt.suptitle('Top 20 Biomarker Genes (Colon)', fontsize=14, fontweight='bold', y=1.00)
+plt.tight_layout()
+plt.show()
+
+
+
 
 
 
@@ -1833,23 +2270,132 @@ model parameters are same as above Colon MLP model.
 LASSO
 -------------------------
 
+Random Forest for SRBCT 
+
+Best Parameters (RF SRBCT): {'max_depth': None, 'max_features': 'sqrt', 'min_samples_split': 2, 'n_estimators': 100}
+Best Cross-Validation Score (RF SRBCT): 0.9692307692307693
+
+Test Data Metrics (RF SRBCT)
+Test Accuracy: 100.00%
+Test F1 Score: 100.00%
+Test Recall: 100.00%
+Test Precision: 100.00%
 
 
+Random Forest for Colon
+
+Best Parameters (RF Colon): {'max_depth': None, 'max_features': 'log2', 'min_samples_split': 2, 'n_estimators': 100}
+Best Cross-Validation Score (RF Colon): 0.8355555555555556
+
+Test Data Metrics (RF Colon)
+Test Accuracy: 76.92%
+Test F1 Score: 82.35%
+Test Recall: 87.50%
+Test Precision: 77.78%
 
 
+SVM SRBCT
+
+Best Parameters (SVM SRBCT): {'C': 0.1, 'gamma': 'scale', 'kernel': 'linear'}
+Best Cross-Validation Score (SVM SRBCT): 0.9846153846153847
+
+Test Data Metrics (SVM SRBCT)
+Test Accuracy: 94.12%
+Test F1 Score: 94.12%
+Test Recall: 94.12%
+Test Precision: 94.12%
 
 
-MLP Colon
+SVM Colon
 
-Cross-Validation Results:
-Mean CV Accuracy: 95.78%
-Std CV Accuracy: 5.18%
+Best Parameters (SVM Colon): {'C': 1, 'gamma': 1, 'kernel': 'sigmoid'}
+Best Cross-Validation Score (SVM Colon): 0.9177777777777777
 
-Test Data Metrics (MLP Colon)
+Test Data Metrics (SVM Colon)
+Test Accuracy: 69.23%
+Test F1 Score: 75.00%
+Test Recall: 75.00%
+Test Precision: 75.00%
+
+
+LDA SRBCT
+
+Best Parameters (LDA SRBCT): {'shrinkage': 'auto', 'solver': 'lsqr'}
+Best Cross-Validation Score (LDA SRBCT): 0.9692307692307693
+
+Test Data Metrics (LDA SRBCT)
+Test Accuracy: 88.24%
+Test F1 Score: 88.24%
+Test Recall: 88.24%
+Test Precision: 88.24%
+
+
+LDA Colon
+
+Best Parameters (LDA Colon): {'shrinkage': 'auto', 'solver': 'lsqr'}
+Best Cross-Validation Score (LDA Colon): 0.8755555555555556
+
+Test Data Metrics (LDA Colon)
 Test Accuracy: 84.62%
 Test F1 Score: 87.50%
 Test Recall: 87.50%
 Test Precision: 87.50%
 
+
+
+XGBoost SRBCT
+
+Best Parameters (XGBoost SRBCT): {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 200, 'subsample': 0.5}
+Best Cross-Validation Score (XGBoost SRBCT): 0.9384615384615385
+
+Test Data Metrics (XGBoost SRBCT)
+Test Accuracy: 94.12%
+Test F1 Score: 94.12%
+Test Recall: 94.12%
+Test Precision: 94.12%
+
+
+XGBoost Colon
+
+Best Parameters (XGBoost Colon): {'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100, 'subsample': 1.0}
+Best Cross-Validation Score (XGBoost Colon): 0.8777777777777779
+
+Test Data Metrics (XGBoost Colon)
+Test Accuracy: 69.23%
+Test F1 Score: 71.43%
+Test Recall: 62.50%
+Test Precision: 83.33%
+
+
+
+MLP SRBCT
+
+Cross-Validation Results:
+Mean CV Accuracy: 95.38%
+Std CV Accuracy: 3.77%
+
+Test Data Metrics
+Test Accuracy: 94.12%
+Test F1 Score (micro): 94.12%
+Test Recall (micro): 94.12%
+Test Precision (micro): 94.12%
+
+model parameters are same as above SRBCT MLP models.
+
+
+MLP Colon
+
+Cross-Validation Results:
+Mean CV Accuracy: 91.78%
+Std CV Accuracy: 4.13%
+
+Test Data Metrics (MLP Colon)
+Test Accuracy: 76.92%
+Test F1 Score: 80.00%
+Test Recall: 75.00%
+Test Precision: 85.71%
+
+
+model parameters are same as above Colon MLP models.
 """
 
