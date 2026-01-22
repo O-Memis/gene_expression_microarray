@@ -10,6 +10,20 @@ Original paper: "Markov blanket-embedded genetic algorithm for gene selection" f
 
 This code includes processing & analyses of 2 different datasets, that named as SRBCT and Colon Tumor.
 
+
+
+SRBCT dataset:
+    
+    83 instances with 2308 features (genes) and class information (4 classes)
+      
+
+                                                            
+Colon Tumor dataset:
+    
+    62 instances with 2000 features, and binary class information (healthy vs tumor)
+
+
+
 RUN THE CODES CELL BY CELL, JUST LIKE A JUPYTER NOTEBOOK
 """
 

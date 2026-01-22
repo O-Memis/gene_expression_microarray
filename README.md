@@ -1,13 +1,17 @@
 # Classification of Gene Expression Levels by Microarray Datasets
 
-This repository implements an end-to-end classification pipeline for benchmark microarray gene-expression datasets. It focuses on (i) selecting a compact set of informative genes and (ii) comparing multiple classifiers under cross-validation and held-out testing. <br><br>
+This repository implements an end-to-end classification pipeline for benchmark microarray gene-expression datasets. It focuses on selecting a compact set of informative genes and comparing multiple classifiers under cross-validation and held-out testing. <br><br>
 
 ## Datasets
 
 Two datasets are included in ARFF format:
 
-- **SRBCT**: Multi-class classification (4 tumor types). File: `SRBCT.arff`.
+- **SRBCT**: Multi-class classification (4 tumor types). File: `SRBCT.arff`. 
+83 instances with 2308 features (genes) and class information. <br>
+        
 - **Colon Tumor**: Binary classification (Tumor vs Normal). File: `Colon.arff`.
+62 instances with 2000 features, and binary class information. <br>
+
 
 Dataset source: https://csse.szu.edu.cn/staff/zhuzx/Datasets.html
 
